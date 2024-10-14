@@ -12,36 +12,14 @@ import { useTicketState } from "../../../hooks/useTicketState";
 import { useFormState } from "../../../hooks/useFormState";
 
 export const Services = () => {
-  const [services, setServices] = useState([]);
-  const { name, serviceSelected } = useTicketState();
-  const { nextStep } = useFormState();
-
-  useEffect(() => {
-    let isMounted = true;
-    const q = query(
-      collection(database, "services"),
-      where("isActive", "==", true)
-    );
-    const getServices = async () => {
-      const querySnapshot = await getDocs(q);
-      const services = [];
-      querySnapshot.forEach((doc) => {
-        services.push({ ...doc.data(), id: doc.id });
-      });
-      if (isMounted) {
-        setServices(services);
-      }
-    };
-    getServices();
-
-    return () => {
-      isMounted = false; // Cleanup function to set isMounted to false
-    };
-  }, []);
+  
+  const { patientName, serviceSelected } = useTicketState();
+  const { nextStep, services } = useFormState();
+  console.log(services);
   return (
     <Grid sx={styles.services}>
       <Box>
-        <Typography sx={styles.title}>Hola {name}!</Typography>
+        <Typography sx={styles.title}>Hola {patientName}!</Typography>
         <Typography sx={styles.subtitle}>Selecciona un servicio</Typography>
       </Box>
       <Box sx={styles.servicesList}>
