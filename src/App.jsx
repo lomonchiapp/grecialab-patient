@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import {Layout} from './Layout'
 import { QueueForm } from './components/QueueForm'
 import {useFormState} from './hooks/useFormState'
@@ -7,11 +7,18 @@ import {useFormState} from './hooks/useFormState'
 import './App.css'
 
 function App() {
-const {fetchServices} = useFormState()
+const {fetchServices, fetchQueues, subscribeToTickets} = useFormState()
 
 useEffect(() => {
   fetchServices()
-}, [fetchServices])
+  fetchQueues()
+
+}, [fetchServices, fetchQueues])
+
+useEffect(() => {
+  const unsubscribe = subscribeToTickets()
+  return () => unsubscribe()
+}, [subscribeToTickets])
 
   return (
     <Layout>

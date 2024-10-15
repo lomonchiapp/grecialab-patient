@@ -3,12 +3,12 @@ import { Box, Typography } from '@mui/material'
 import { useTicketState } from '../../hooks/useTicketState'
 
 export const ServiceItem = ({service}) => {
-    const {serviceSelected, setServiceSelected} = useTicketState()
+    const {selectedService, setSelectedService} = useTicketState()
 
   return (
     <Box
-        onClick={() => setServiceSelected(service)}
-    sx={serviceSelected === service? styles.selectedItem : styles.item}>
+        onClick={() => setSelectedService(service)}
+    sx={selectedService === service? styles.selectedItem : styles.item}>
         <Typography sx={styles.name}>{service.name}</Typography>
     </Box>
   )

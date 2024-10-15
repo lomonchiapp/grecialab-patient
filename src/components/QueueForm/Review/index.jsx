@@ -1,84 +1,64 @@
 // React Imports
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState} from "react";
 import { Box, Typography } from "@mui/material";
 // Import Global State
 import { useTicketState } from "../../../hooks/useTicketState";
 import { useFormState } from "../../../hooks/useFormState";
 // Import Firebase
-import { database } from "../../../firebase";
-import { getDocs, collection, query, where, serverTimestamp } from "firebase/firestore";
 // Custom Hooks
 import {newTicket} from "../../../hooks/newTicket";
+import {handlePrint} from "../../../hooks/handlePrint";
+
+import { TicketView } from "./TicketView";
 
 export const Review = () => {
-  const { patientName, serviceSelected, resetTicket } = useTicketState();
-    const { reset } = useFormState();
-  const [selectedQ, setSelectedQ] = useState(null);
+  const { patientName, selectedService, selectedQueue, setSelectedQueue, resetTicket } = useTicketState();
+    const { reset, queues } = useFormState();
+  
+    const generatedTicket = `${selectedQueue?.name} - ${selectedQueue?.count?.toString().padStart(2, "0")}`;
+  
+    const [ticket, setTicket] = useState(null);
+    const ticketRef = useRef(null);
 
-  const getQueueByService = async (serviceId) => {
-    // Implement this function to get the queue by service
-    const q = query(
-      collection(database, "queues"),
-      where("service", "==", serviceId)
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      setSelectedQ(doc.data());
-    });
-  };
+
 
   useEffect(() => {
-    if (serviceSelected) {
-      getQueueByService(serviceSelected.id);
+    if (selectedService) {
+      setTicket({
+        patientName: patientName,
+        service: selectedService.id,
+        ticketCode: generatedTicket,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      const correspondingQueue = queues.find((queue) => queue.serviceId === selectedService.id);
+      setSelectedQueue(correspondingQueue);
+      console.log(correspondingQueue);
     }
-  }, [serviceSelected]);
+  }, [selectedService, patientName, generatedTicket, queues, setSelectedQueue]);
 
-  const generatedTicket = `${selectedQ?.name} - ${selectedQ?.count
-    ?.toString()
-    .padStart(2, "0")}`;
 
-    const onSubmit = async () => {
-        const ticket = {
-            patientName,
-            service: serviceSelected.id,
-            queue: selectedQ.id,
-            ticketCode: generatedTicket,
-            status: 'Pendiente',
-            createdAt: serverTimestamp()
-        }
-        await newTicket(ticket, selectedQ)
-        window.print()
+
+    const onSubmit = async (e) => {
+        e.preventDefault()
+        await newTicket(ticket, selectedQueue)
+        await handlePrint(ticketRef)
         reset()
         resetTicket()
     }
 
   return (
-    <Box sx={styles.voucher}>
 
-      <Box>
-        <Box sx={styles.rowInfo}>
-          <Typography sx={styles.label}>Nombre:</Typography>
-          <Typography sx={styles.value}>{patientName}</Typography>
-        </Box>
-        <Box sx={styles.rowInfo}>
-          <Typography sx={styles.label}>Servicio:</Typography>
-          <Typography sx={styles.value}>{serviceSelected.name}</Typography>
-        </Box>
-        <Box sx={styles.rowInfo}>
-          <Typography sx={styles.label}>Fila:</Typography>
-          <Typography sx={styles.value}>{selectedQ?.name}</Typography>
-        </Box>
+    <Box sx={styles.voucher}>
+      <Box ref={ticketRef}>
+        <TicketView payload={ticket}/>
       </Box>
-      <Box sx={styles.ticketContainer}>
-        <Typography sx={styles.ticketLabel}>Ticket:</Typography> 
-        <Typography sx={styles.ticketText}>{generatedTicket}</Typography>
-      </Box>
-      <Typography sx={styles.title}>¡Gracias por elegirnos!</Typography>
-      <Typography sx={styles.subtitle}>Por favor, imprime tu ticket</Typography>
+      
       <Box
         component="button"
         className="stepBtn"
-        onClick={() => onSubmit()}
+        onClick={onSubmit}
       >
         Imprimir Turno
       </Box>
