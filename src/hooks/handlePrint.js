@@ -15,7 +15,7 @@ export const handlePrint = async (ticketRef) => {
 
       // Send the image to the print server
       try {
-        const response = await fetch('http://localhost:3000/print', {
+        const response = await fetch('http://192.168.1.87:3000/print', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
