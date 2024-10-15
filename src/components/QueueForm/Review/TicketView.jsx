@@ -134,15 +134,14 @@ const styles = {
   },
   billingQueue: {
     color: "black",
-    fontSize: "14px",
+    fontSize: "16px",
   },
   serviceQueue: {
     color: "black",
-    fontSize: "14px",
+    fontSize: "16px",
   },
     info: {
         color: "black",
-        fontWeight: "bold",
-        fontSize: "10px",
+        fontSize: "14px",
     },
 };
