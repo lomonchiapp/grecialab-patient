@@ -79,7 +79,7 @@ const styles = {
     gap: 1,
     height: "100%",
     padding: "10px",
-    margin: "10px",
+    paddingBottom:"100px",
     backgroundColor: "white",
     borderRadius: "5px",
   },
