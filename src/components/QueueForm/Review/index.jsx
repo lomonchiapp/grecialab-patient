@@ -1,6 +1,6 @@
 // React Imports
 import { useEffect, useRef, useState} from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 // Import Global State
 import { useTicketState } from "../../../hooks/useTicketState";
 import { useFormState } from "../../../hooks/useFormState";
