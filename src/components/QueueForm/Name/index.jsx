@@ -26,19 +26,30 @@ export const Name = () => {
           helperText={error}
         />
       </Box>
-      <Box>
+      <Box sx={{display:'flex',flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
         <Box
           component="button"
           className="stepBtn"
           onClick={() => {
             if (!patientName) {
-              setError("Por favor, ingresa tu nombre");
+              setError("Por favor, introduce tu nombre");
               return;
             }
             nextStep();
           }}
         >
           Elegir Servicio
+        </Box>
+        <Box>
+          <Box
+            component="button"
+            style={styles.rapidTicket}
+            onClick={() => {
+              nextStep();
+            }}
+          >
+            Ticket Rápido
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -57,6 +68,15 @@ const styles = {
   },
   nameInput: {
     marginBottom: 15,
+  },
+  rapidTicket: {
+    marginTop: 15,
+    color: "#fff",
+    backgroundColor: "#072879",
+    padding: "20px 30px",
+    borderRadius: 5,
+    fontSize:25,
+    cursor: "pointer",
   },
   title: {
     color: "#fff",

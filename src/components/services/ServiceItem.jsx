@@ -1,18 +1,33 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 import { useTicketState } from '../../hooks/useTicketState'
+import { useFormState } from '../../hooks/useFormState'
 
 export const ServiceItem = ({service}) => {
-    const {selectedService, setSelectedService} = useTicketState()
+    const { selectedServices, setSelectedServices, setSelectedQueues, selectedQueues } = useTicketState();
+    const { queues } = useFormState();
 
-  return (
-    <Box
-        onClick={() => setSelectedService(service)}
-    sx={selectedService === service? styles.selectedItem : styles.item}>
-        <Typography sx={styles.name}>{service.name}</Typography>
-    </Box>
-  )
-}
+    const handleServiceClick = () => {
+        if (selectedServices.includes(service)) {
+            setSelectedServices(selectedServices.filter((s) => s !== service));
+            setSelectedQueues(selectedQueues.filter((q) => q.serviceId !== service.id));
+        } else {
+            const correspondingQueue = queues.find((q) => q.serviceId === service.id);
+            setSelectedServices([...selectedServices, service]);
+            if (correspondingQueue) {
+                setSelectedQueues([...selectedQueues, correspondingQueue]);
+            }
+        }
+    };
+
+    return (
+        <Box
+            onClick={handleServiceClick}
+            sx={selectedServices.includes(service) ? styles.selectedItem : styles.item}>
+            <Typography sx={styles.name}>{service.name}</Typography>
+        </Box>
+    );
+};
 
 const styles = {
     item: {
@@ -20,9 +35,10 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: 'transparent',
+
         padding: '20px',
-        border: '1px solid transparent',
+        border: '1px solid #FFF',
         borderRadius: '10px',
         boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
         cursor: 'pointer'
@@ -31,16 +47,16 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        border: '1px solid #FFF',
         justifyContent: 'center',
-        backgroundColor: '#50B3E8',
+        backgroundColor: '#439df8',
         padding: '20px',
+        border: '1px solid #000',
         borderRadius: '10px',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
         cursor: 'pointer'
     },
     name: {
-        fontSize: '1.5rem',
-        color: '#28358B'
+        fontSize: '30px',
+        fontWeight: 'bold'
     }
-    }
+};

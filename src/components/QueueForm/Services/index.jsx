@@ -13,13 +13,11 @@ import { useFormState } from "../../../hooks/useFormState";
 
 export const Services = () => {
   
-  const { patientName, selectedService, setSelectedService } = useTicketState();
+  const { patientName, selectedServices } = useTicketState();
   const { nextStep, services } = useFormState();
-  console.log(services);
   return (
     <Grid sx={styles.services}>
       <Box>
-        <Typography sx={styles.title}>Hola {patientName}!</Typography>
         <Typography sx={styles.subtitle}>Selecciona un servicio</Typography>
       </Box>
       <Box sx={styles.servicesList}>
@@ -27,12 +25,12 @@ export const Services = () => {
           <ServiceItem key={index} service={service} />
         ))}
       </Box>
-      {selectedService && (
+      {selectedServices && (
         <Box
           component="button"
           className="stepBtn"
           onClick={() => nextStep()}>
-          {selectedService.name} | Continuar
+           Continuar
         </Box>
       )}
     </Grid>

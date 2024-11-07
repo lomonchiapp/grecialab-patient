@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // React Imports
-import { useEffect, useRef, useState} from "react";
-import { Box } from "@mui/material";
+import { useEffect, useRef, useCallback, useState} from "react";
+import { Box, Typography, CircularProgress } from "@mui/material";
 // Import Global State
 import { useTicketState } from "../../../hooks/useTicketState";
 import { useFormState } from "../../../hooks/useFormState";
@@ -12,41 +13,55 @@ import {handlePrint} from "../../../hooks/handlePrint";
 import { TicketView } from "./TicketView";
 
 export const Review = () => {
-  const { patientName, selectedService, selectedQueue, setSelectedQueue, resetTicket } = useTicketState();
-    const { reset, queues } = useFormState();
-  
-    const generatedTicket = `${selectedQueue?.name} - ${selectedQueue?.count?.toString().padStart(2, "0")}`;
-  
-    const [ticket, setTicket] = useState(null);
-    const ticketRef = useRef(null);
+  const { patientName, selectedServices, selectedQueues, setSelectedQueues, resetTicket } = useTicketState();
+  const { reset, queues } = useFormState();
+  const [generatedTicket, setGeneratedTicket] = useState("");
+  const [ticket, setTicket] = useState(null);
+  const ticketRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
-
+  const updateGeneratedTicket = useCallback(() => {
+    if (selectedServices.length > 0 && selectedQueues.length > 0) {
+      const count = selectedQueues[0]?.count || 0;
+      const formattedCount = count.toString().padStart(2, "0");
+      const ticketCode = `${selectedServices.map(service => service.name.slice(0, 1).toUpperCase()).join('')} - ${formattedCount}`;
+      setGeneratedTicket(ticketCode);
+    } else {
+      setGeneratedTicket("");
+    }
+  }, [selectedServices, selectedQueues]);
 
   useEffect(() => {
-    if (selectedService) {
+    updateGeneratedTicket();
+  }, [selectedServices, selectedQueues, updateGeneratedTicket]);
+
+  useEffect(() => {
+    if (selectedServices) {
       setTicket({
         patientName: patientName,
-        service: selectedService.id,
+        services: selectedServices.map(service => ({
+          id: service.id,
+          name: service.name,
+          status: "pending",
+        })),
+        queues: selectedQueues,
         ticketCode: generatedTicket,
         status: "pending",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
-      const correspondingQueue = queues.find((queue) => queue.serviceId === selectedService.id);
-      setSelectedQueue(correspondingQueue);
-      console.log(correspondingQueue);
     }
-  }, [selectedService, patientName, generatedTicket, queues, setSelectedQueue]);
+  }, [selectedServices, selectedQueues, generatedTicket, patientName]);
 
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setIsPrinting(true);
+    await newTicket(ticket, selectedQueues);
+    await handlePrint(ticketRef);
+    reset();
+    resetTicket();
+  };
 
-
-    const onSubmit = async (e) => {
-        e.preventDefault()
-        await newTicket(ticket, selectedQueue)
-        await handlePrint(ticketRef)
-        reset()
-        resetTicket()
-    }
 
   return (
 
@@ -55,14 +70,24 @@ export const Review = () => {
         <TicketView payload={ticket}/>
       </Box>
       
-      <Box
-        component="button"
-        className="stepBtn"
-        onClick={onSubmit}
-      >
-        Imprimir Turno
+     
+        {
+          !isPrinting ? ( <Box
+            component="button"
+            sx={styles.printButton}
+            onClick={onSubmit}
+          >
+            <Typography sx={styles.printButtonText}>Imprimir</Typography>
+          </Box>
+            ) : (
+              <Box sx={styles.loadingBox}>
+                <CircularProgress size={24} />
+                <Typography>Imprimiendo...</Typography>
+                </Box>
+            )
+        }
+
       </Box>
-    </Box>
   );
 };
 
@@ -75,6 +100,28 @@ const styles = {
     backgroundColor: "#fff",
     padding: 4,
     borderRadius: "10px",
+  },
+  loadingBox: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#072879",
+    color: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    marginTop: "20px",
+  },
+  printButton: {
+    backgroundColor: "#072879",
+    color: "#fff",
+    padding: "20px 30px",
+    marginTop: "20px",
+    borderRadius: "10px",
+    cursor: "pointer",
+  },
+  printButtonText: {
+    fontSize: "30px",
   },
   rowInfo:{
     display: "flex",

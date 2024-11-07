@@ -5,18 +5,10 @@ import { useFormState } from "../../../hooks/useFormState";
 export const TicketView = ({ payload }) => {
   const { tickets, services } = useFormState();
 
-  if (!payload || !payload.service) {
+  if (!payload || !payload.services) {
     return null;
   }
 
-  const serviceById = (id) => {
-    const service = services.find((service) => service.id === id)
-    return service.name
-  };
-
-  const personsInQueue = tickets.filter((ticket) =>
-      ticket.status === "inQueue" && ticket.service === payload.service
-  ).length;
   const personsInBillingQueue = tickets.filter(
     (ticket) => ticket.status === "pending"
   ).length;
@@ -40,9 +32,6 @@ export const TicketView = ({ payload }) => {
       <Box>
         <Typography sx={styles.patientName}>{payload.patientName}</Typography>
       </Box>
-      <Box sx={styles.serviceBox}>
-        <Typography sx={styles.service}>{serviceById(payload.service)}</Typography>
-      </Box>
       <Box sx={styles.dateContainer}>
         <Box>
           <Typography sx={styles.date}>{actualDate}</Typography>
@@ -57,9 +46,6 @@ export const TicketView = ({ payload }) => {
         </Typography>
       </Box>
       <Box>
-        <Typography sx={styles.serviceQueue}>
-          Personas en cola de {serviceById(payload.service)}: <span style={{fontWeight:'bold'}}>{personsInQueue}</span>
-        </Typography>
       </Box>
       <Box>
         <Typography sx={styles.info}>
@@ -77,7 +63,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     gap: 1,
-    height: "100%",
     padding: "10px",
     paddingBottom:"100px",
     backgroundColor: "white",

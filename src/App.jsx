@@ -7,13 +7,13 @@ import {useFormState} from './hooks/useFormState'
 import './App.css'
 
 function App() {
-const {fetchServices, fetchQueues, subscribeToTickets} = useFormState()
+const {fetchServices, fetchQueues, subscribeToTickets, fetchIP} = useFormState()
 
 useEffect(() => {
   fetchServices()
   fetchQueues()
-
-}, [fetchServices, fetchQueues])
+  fetchIP()
+}, [fetchServices, fetchQueues, fetchIP])
 
 useEffect(() => {
   const unsubscribe = subscribeToTickets()
